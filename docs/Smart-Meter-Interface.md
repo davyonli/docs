@@ -3398,3 +3398,40 @@ Tested on an AEConversion INV500-90 with RS485 interface.
     1,=so3,256
     #
     ```
+### Siconia T211
+
+Smart meter that also relays the counters of the gas and water meters.
+
+??? summary "View script"
+
+    ```
+    >D 
+    >B  
+    ->sensor53 r
+    >M 1
+    +1,18,o,0,115200,meter
+    ; script voor Siconia T211 meter met gas en water output 
+    ; zie https://tasmota.github.io/docs/Smart-Meter-Interface/
+    ; test met volgende in console : 
+    ; sensor53 d1
+    ;<M>,<decoder>@<scale><offs>,<label>,<UoM>,<var>,<precision>
+    ;======== Elektriciteit =========
+    1,1-0:1.7.0(@0.001,actueel_verbruik,W,actueel_verbruik,0
+    1,1-0:1.8.1(@1,Total_in_day,kWh,Total_in_day,4
+    1,1-0:1.8.2(@1,Total_in_night,kWh,Total_in_night,4
+    ;=== calc sum totalday en totalnight
+    1,=m2+3@1,Total_in_sum,kWh,Total_in_sum,4
+    ; hieronder de data vanuit de 2e haakjes uitlezen
+    ; gebruik (@(1:1
+    1,1-0:1.6.0(@(1:1,piek_huidige maand,kW,Peak,3
+    1,1-0:21.7.0(@0.001,Watt_L1,W,Watt_L1,0
+    1,1-0:41.7.0(@0.001,Watt_L2,W,Watt_L2,0
+    1,1-0:61.7.0(@0.001,Watt_L3,W,Watt_L3,0
+    ;========      Gas      =========
+    1,0-1:24.2.3(@(1:1,Gas,m³,Gas,3
+    1,=m9*#116/#10@1,Gas_kWh,kWh,Gas_kWh,3
+    ;========      Water    =========
+    1,0-2:24.2.1(@(1:1,Water,m³,Water,3
+    ;#
+    ...
+    
